@@ -1,0 +1,68 @@
+import secrets
+import string
+
+def get_valid_length():
+    while True:
+        try:
+            length = int(input("Enter password length (min 8): "))
+            if length < 8:
+                print("Password length must be at least 8.")
+            else:
+                return length
+        except ValueError:
+            print("Please enter a valid number.")
+
+def generate_password(length, numbers=True, special_characters=True):
+    letters = string.ascii_letters
+    digits = string.digits
+    special = string.punctuation
+
+    password_chars = []
+
+    
+    password_chars.append(secrets.choice(letters))
+
+    if numbers:
+        password_chars.append(secrets.choice(digits))
+
+    if special_characters:
+        password_chars.append(secrets.choice(special))
+
+    all_chars = letters
+    if numbers:
+        all_chars += digits
+    if special_characters:
+        all_chars += special
+
+    
+    while len(password_chars) < length:
+        password_chars.append(secrets.choice(all_chars))
+
+    
+    secrets.SystemRandom().shuffle(password_chars)
+
+    return "".join(password_chars)
+
+def password_strength(password):
+    score = 0
+    if any(c.islower() for c in password): score += 1
+    if any(c.isupper() for c in password): score += 1
+    if any(c.isdigit() for c in password): score += 1
+    if any(c in string.punctuation for c in password): score += 1
+
+    if len(password) >= 12 and score >= 3:
+        return "Strong"
+    elif score >= 2:
+        return "Medium"
+    else:
+        return "Weak"
+
+length = get_valid_length()
+use_numbers = input("Include numbers? (y/n): ").lower() == "y"
+use_special = input("Include special characters? (y/n): ").lower() == "y"
+
+password = generate_password(length, use_numbers, use_special)
+strength = password_strength(password)
+
+print("\nGenerated Password:", password)
+print("Password Strength:", strength)
